@@ -1,0 +1,34 @@
+
+name: Docker Permissions
+
+on: 
+  push
+    # branches-ignore:
+    #   - master
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test_docker_perms:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Show environment
+      run: docker version
+    - name: Create temp directory
+      run: |
+        mkdir temp
+        echo "hello direct" > ./temp/direct.txt
+        ls -la
+        pwd
+    - name: Build Docker image
+      run: |
+        docker build -t maxjeffostest .
+        docker image ls
+    - name: Create file in container
+      run: docker run --rm -v $(pwd)/temp:/mounted maxjeffostest:latest
+    - name: Show temp directory
+      run: |
+        ls -la temp
+    
