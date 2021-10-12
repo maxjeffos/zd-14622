@@ -16,19 +16,36 @@ jobs:
     - uses: actions/checkout@v2
     - name: Show environment
       run: docker version
+
     - name: Create temp directory
       run: |
         mkdir temp
-        echo "hello direct" > ./temp/direct.txt
         ls -la
+        echo "hello direct" > ./temp/direct.txt
+        ls -la temp
         pwd
+
     - name: Build Docker image
       run: |
         docker build -t maxjeffostest .
         docker image ls
+
     - name: Create file in container
-      run: docker run --rm -v $(pwd)/temp:/mounted maxjeffostest:latest
+      run: |
+        docker run --rm -v $(pwd)/temp:/mounted maxjeffostest:latest
+        ls -la temp
+        mv ./temp/container.txt ./temp/container-no-user-passed.txt
+        ls -la temp
+
+    - name: Show user/group stuff
+      run: |
+        id
+
+    - name: Create file in container with passed user/group
+      run: |
+        docker run --rm -u 1001:121 -v $(pwd)/temp:/mounted maxjeffostest:latest
+        mv ./temp/container.txt ./temp/container-with-user-passed.txt
+
     - name: Show temp directory
       run: |
         ls -la temp
-    
