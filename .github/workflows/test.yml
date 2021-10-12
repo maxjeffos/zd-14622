@@ -25,6 +25,10 @@ jobs:
         ls -la temp
         pwd
 
+
+
+
+
     - name: Build Docker image
       run: |
         docker build -t maxjeffostest .
@@ -46,6 +50,30 @@ jobs:
         docker run --rm -u 1001:121 -v $(pwd)/temp:/mounted maxjeffostest:latest
         mv ./temp/container.txt ./temp/container-with-user-passed.txt
 
+
+    - name: Build Docker image that changes user
+      working-directory: ./docker-change-user
+      run: |
+        ls -la
+        ./db.sh
+        docker image ls
+
+    - name: Create file in container that changes user
+      run: |
+        export USER_ID=$(id -u)
+        docker run --rm -e USER_ID -v $(pwd)/temp:/mounted maxjeffos-change-user:latest
+        ls -la temp
+
+
+
     - name: Show temp directory
       run: |
         ls -la temp
+
+    - name: Delete the files
+      run: |
+        ls -la temp
+        rm temp/*
+        ls -la temp
+        groups
+        sudo cat /etc/sudoers
